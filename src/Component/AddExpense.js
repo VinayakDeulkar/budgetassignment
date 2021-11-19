@@ -65,12 +65,12 @@ export default function AddExpense() {
                     });
                     let total=a+parseInt(Amount.current.value)
                     let check=false;
-                    if(total<=decryptedDatabudget&&Amount.current.value<=decryptedDatabudget){
-                        check=true;
-                    }
-                    else{
-                        check=false;
-                    }
+                        if(total<=decryptedDatabudget&&parseInt(Amount.current.value)<=decryptedDatabudget){
+                            check=true;
+                        }
+                        else{
+                            check=false;
+                        }
                     if(Title.current.value!=''&&Amount.current.value!='' && check!=false){
                         let id=Math.random()
                         let title=Title.current.value;
@@ -93,7 +93,7 @@ export default function AddExpense() {
                     }
                 }
                 else{
-                    if(Amount.current.value<=decryptedDatabudget){
+                    if(parseInt(Amount.current.value)<=decryptedDatabudget){
                         let arr=[]
                         let id=Math.random()
                         let title=Title.current.value;
