@@ -9,6 +9,7 @@ export default function AddExpense() {
     const [ErrorTitle, setErrorTitle] = useState('')
     const [ErrorAmount, setErrorAmount] = useState('')
     const [updating, setupdating] = useState(false)
+    const [decAmount, setdecAmount] = useState('')
     const [ID, setID] = useState('')
     const regForName=RegExp(/[A-Za-z ]+/)
     const regForAmount=RegExp(/[0-9]+/)
@@ -27,9 +28,11 @@ export default function AddExpense() {
            
             Title.current.value=decryptedDatautitle
             Amount.current.value=decryptedDatauamount
+            setdecAmount(decryptedDatauamount)
         }
         
     }, [count])
+    
     
     const handler=(event)=>{
         const name=event.target.name
@@ -48,10 +51,10 @@ export default function AddExpense() {
     }
     const addData=async()=>{
         if(localStorage.getItem('budget')!=undefined){
+                let budget=JSON.parse(localStorage.getItem('budget'))
+                var bytesbudget = CryptoJS.AES.decrypt(budget, 'my-secret-key@123');
+                var decryptedDatabudget = JSON.parse(bytesbudget.toString(CryptoJS.enc.Utf8));
             if(!updating){
-                    let budget=JSON.parse(localStorage.getItem('budget'))
-                    var bytesbudget = CryptoJS.AES.decrypt(budget, 'my-secret-key@123');
-                    var decryptedDatabudget = JSON.parse(bytesbudget.toString(CryptoJS.enc.Utf8));
                 if(localStorage.getItem('mylist')!=undefined){
                     let array=JSON.parse(localStorage.getItem('mylist'))
                     let a=0;
@@ -60,7 +63,15 @@ export default function AddExpense() {
                         var decryptedDataamount = JSON.parse(bytesamount.toString(CryptoJS.enc.Utf8));
                         a=a+parseInt(decryptedDataamount)
                     });
-                    if(Title.current.value!=''&&Amount.current.value!='' && (a+Amount.current.value<=decryptedDatabudget)){
+                    let total=a+parseInt(Amount.current.value)
+                    let check=false;
+                    if(total<=decryptedDatabudget&&Amount.current.value<=decryptedDatabudget){
+                        check=true;
+                    }
+                    else{
+                        check=false;
+                    }
+                    if(Title.current.value!=''&&Amount.current.value!='' && check!=false){
                         let id=Math.random()
                         let title=Title.current.value;
                         let amount=Amount.current.value;
@@ -78,14 +89,11 @@ export default function AddExpense() {
                         Amount.current.value=''
                     }
                     else{
-                        alert("Pls enter the data");
+                        alert("Out of budget");
                     }
                 }
                 else{
-                    alert(Amount.current.value)
-                    alert(decryptedDatabudget)
                     if(Amount.current.value<=decryptedDatabudget){
-                        alert('hii')
                         let arr=[]
                         let id=Math.random()
                         let title=Title.current.value;
@@ -106,7 +114,23 @@ export default function AddExpense() {
                 }
             }
             else{
-                if(Title.current.value!=''&&Amount.current.value!=''){
+                let a=0;
+                let array=JSON.parse(localStorage.getItem('mylist'))
+                    array.forEach(element => {
+                        var bytesamount = CryptoJS.AES.decrypt(element.amount, 'my-secret-key@123');
+                        var decryptedDataamount = JSON.parse(bytesamount.toString(CryptoJS.enc.Utf8));
+                        a=a+parseInt(decryptedDataamount)
+                    });
+                    a=a-decAmount
+                    let total=a+parseInt(Amount.current.value)
+                    let check=false;
+                    if(total<=decryptedDatabudget){
+                        check=true;
+                    }
+                    else{
+                        check=false;
+                    }
+                if(Title.current.value!=''&&Amount.current.value!='' && check!=false){
                     let arr=JSON.parse(localStorage.getItem('mylist'))
                     let title=Title.current.value;
                     let amount=Amount.current.value;
@@ -131,6 +155,9 @@ export default function AddExpense() {
                     Amount.current.value='';
                     setupdating(false)
                     localStorage.removeItem('updatekey')
+                }
+                else{
+                    alert('Enter valid data to update')
                 }
             }
         }
@@ -161,8 +188,7 @@ export default function AddExpense() {
                         }
                     </Form>
                 </Col>
-            </Row>   
-            
+            </Row> 
         </div>
     )
 }

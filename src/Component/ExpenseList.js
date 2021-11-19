@@ -2,9 +2,14 @@ import React,{useEffect, useState} from 'react'
 import { Col, Row, Table,Button } from 'react-bootstrap'
 import { PencilSquare, Trash } from 'react-bootstrap-icons'
 import { useDispatch } from 'react-redux'
+import Snackbar from '@mui/material/Snackbar';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
 const CryptoJS=require("crypto-js")
 export default function ExpenseList() {
     const [ExpenseList, setExpenseList] = useState({Data:''})
+    const [message, setmessage] = useState('')
+    const [open, setopen] = useState(false)
     const dispatch=useDispatch()
     useEffect(() => {
         let arr=[]
@@ -35,7 +40,11 @@ export default function ExpenseList() {
                 var cipheruamount = CryptoJS.AES.encrypt(JSON.stringify(element.amount), 'my-secret-key@123').toString();
                 let data={id:cipheruid,title:cipherutitle,amount:cipheruamount}
                 localStorage.setItem('updatekey',JSON.stringify(data))
-                dispatch({type:'ExpenseList'})
+                setmessage('Updating value')
+                setopen(true)
+                    setTimeout(() => {
+                        dispatch({type:'ExpenseList'})
+                    }, 1000);
             }
         });
     }
@@ -52,8 +61,33 @@ export default function ExpenseList() {
         });
         localStorage.setItem('mylist',JSON.stringify(array))
         setExpenseList({Data:arr})
-        dispatch({type:'ExpenseList'})
+        setmessage('Expenese Deleted')
+        setopen(true)
+        setTimeout(() => {
+            dispatch({type:'ExpenseList'})
+        }, 1000);
+        
     }
+    const handleClose = (event, reason) => {
+        if (reason === 'clickaway') {
+          return;
+        }
+    
+        setopen(false);
+      };
+    const action = (
+        <React.Fragment>
+          
+          <IconButton
+            size="small"
+            aria-label="close"
+            color="inherit"
+            onClick={handleClose}
+          >
+            <CloseIcon fontSize="small" />
+          </IconButton>
+        </React.Fragment>
+      );
     return (
         <div>
            <Row>
@@ -82,6 +116,13 @@ export default function ExpenseList() {
                        </tbody>
                    </Table>
                </Col>
+               <Snackbar
+                open={open}
+                autoHideDuration={6000}
+                onClose={handleClose}
+                message={message}
+                action={action}
+            />
            </Row>
         </div>
     )

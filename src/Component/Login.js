@@ -1,7 +1,9 @@
 import React,{useState,useEffect,useRef} from 'react'
 import { Card, Col, Container, Form, Modal, Row,Button } from 'react-bootstrap'
 import FacebookLogin from 'react-facebook-login'
-import GoogleLogin from 'react-google-login'
+import Snackbar from '@mui/material/Snackbar';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
 import {BrowserRouter as Router, Link,useHistory } from 'react-router-dom'
 import axios from 'axios'
 const client=axios.create({
@@ -9,6 +11,7 @@ const client=axios.create({
 })
 export default function Login() {
     const [UserData, setUserData] = useState({Userdata:[]})
+    const [open, setopen] = useState(false)
     const [EmailError, setEmailError] = useState('')
     const [PasswordError, setPasswordError] = useState('')
     const Email = useRef('')
@@ -34,15 +37,12 @@ export default function Login() {
   const  responseFacebook = (response) => {
         console.log(response);
         if(response!=undefined){
-            history.push('/HomePage')
+            setopen(true)
+            setTimeout(() => {
+                history.push('/HomePage')
+            }, 3000);
+            
         }
-    }
-   const responseGoogle = (response) => {
-        console.log(response)
-        if(response!=undefined){
-            history.push('/HomePage')
-        }
-
     }
     const handler=(event)=>{
         const name=event.target.name;
@@ -65,6 +65,7 @@ export default function Login() {
         if(EmailError==''&&PasswordError=='' &&Email.current.value!='' && Password.current.value){
             UserData.Userdata.forEach(element=>{
                 if(element.email===Email.current.value&& element.password===Password.current.value){
+                    setopen(true)
                     history.push("/HomePage")
                 }
             })
@@ -79,6 +80,25 @@ export default function Login() {
     const Loginemail=()=>{
         setForms(true)
     }
+    const handleClose = (event, reason) => {
+        if (reason === 'clickaway') {
+          return;
+        }
+    
+        setopen(false);
+      };
+    const action = (
+        <React.Fragment>
+          <IconButton
+            size="small"
+            aria-label="close"
+            color="inherit"
+            onClick={handleClose}
+          >
+            <CloseIcon fontSize="small" />
+          </IconButton>
+        </React.Fragment>
+      );
     return (
         <>
         <Router>
@@ -148,6 +168,13 @@ export default function Login() {
                 :''
                 }
             </Container>
+            <Snackbar
+                    open={open}
+                    autoHideDuration={6000}
+                    onClose={handleClose}
+                    message="Logging in "
+                    action={action}
+                />
             </Router>
         </>
     )

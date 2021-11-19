@@ -4,6 +4,7 @@ import Login from './Component/Login';
 import {BrowserRouter as Router,Switch,Route } from 'react-router-dom';
 import Register from './Component/Register';
 import HomePage from './Component/HomePage';
+import NotFound from './Component/NotFound';
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
             <Route path='/' exact component={Login}/>
             <Route path='/Register' exact component={Register}/>
             <Route path='/HomePage' exact component={HomePage}/>
+            <Route path='*' component={NotFound}/>
           </Switch>
       </Router>
     </div>
